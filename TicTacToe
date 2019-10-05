@@ -1,0 +1,187 @@
+import java.util.Scanner;
+import java.util.Random;
+public class TicTacToe2 {
+    static int Biglength;
+    static int Victory;
+    static char [][] field;
+    static char BotPlayer = 'O';
+    static char fieldFigure = '☐';
+    static char FirstPlayer = '✕';
+    static Random random = new Random();
+    public static void main(String[] args) {
+        Scanner length = new Scanner(System.in);
+        System.out.println("Задайте длину поля");
+        Biglength = length.nextInt();
+
+        Scanner VictorCondition = new Scanner(System.in);
+        System.out.println("Задайте выигрышное число");
+        Victory = VictorCondition.nextInt();
+
+        initField();
+        DrawField();
+        while (true){
+            yourTurn();
+            //DrawField();
+            if(checkVictory(FirstPlayer)){
+                System.out.println("Поздравляем с победой");
+                break;
+            }
+            if (Draw()){
+                System.out.println("Ничья");
+                break;
+            }
+            ComputerTurn();
+            DrawField();
+            if (checkVictory(BotPlayer)){
+                System.out.println("Компуктер победил");
+                break;
+            }
+            if (Draw()){
+                System.out.println("Ничья");
+                break;
+            }
+
+        }
+    }
+    public static void initField(){
+        field = new char[Biglength][Biglength];
+        for (int i=0; i<Biglength; i++){
+            for (int u=0; u<Biglength; u++){
+                field[i][u] = fieldFigure;
+            }
+        }
+    }
+    public static void DrawField(){
+        for (int i=0; i<Biglength; i++){
+            for (int u=0; u<Biglength; u++){
+                System.out.print(field[i][u] + " ");
+            }
+            System.out.println();
+        }
+    }
+    public static void yourTurn(){
+        Scanner Xcoord = new Scanner(System.in);
+        Scanner Ycoord = new Scanner(System.in);
+        System.out.println("Напишите координпту Х от 1 до 5");
+        int x= Xcoord.nextInt();
+        x=x-1;
+        System.out.println("Напишите координпту Y от 1 до 5");
+        int y=Ycoord.nextInt();
+        y=y-1;
+        if (field[x][y]==BotPlayer) {
+            System.out.println("Выберите свободное место");
+        }
+        else if (isPlaceGood(y, x)){
+            field[y][x] = FirstPlayer;}
+        else System.out.println("Выберите свободное место");
+        DrawField();
+        System.out.println("____________");
+    }
+    public static void ComputerTurn(){
+        int x=-1;
+        int y=-1;
+        for (int i=0; i<Biglength; i++){
+            for (int u=0; u<Biglength; u++){
+                if (isPlaceGood(i, u)){
+                    field [i][u] = FirstPlayer;
+                    if (checkVictory(FirstPlayer)){
+                        x=u;
+                        y=i;
+                    }
+                    field [i][u] = fieldFigure;
+                }
+                if (checkVictory(BotPlayer)){
+                    field [i][u] = BotPlayer; break;
+                }
+            }
+        }
+
+        //if (x==-1 && y==-1){
+
+        while (!isPlaceGood(y, x)){
+            x = random.nextInt(Biglength);
+            y = random.nextInt(Biglength);
+        }
+        field[y][x]= BotPlayer;
+    }
+
+    public static boolean Draw(){
+        int draw =0;
+        for (int i=0; i<Biglength; i++){
+            for (int u=0; u<Biglength; u++){
+                if (field[i][u] ==fieldFigure){
+                    draw++;
+                }
+            }
+        }
+        return draw == 0;
+    }
+    public static boolean checkVictory(char symbol){
+        for(int i=0; i<Biglength; i++){
+            for (int u=0; u<Biglength; u++){
+                if (HorizonWin(i, u, symbol) || VerticalWin(i, u, symbol) ||
+                        Diag1Win(i, u, symbol) || Diag2Win(i, u, symbol)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    public static boolean isPlaceGood (int y, int x){
+        if (x<0 || y<0 || x>Biglength || y>Biglength){
+            return false;
+        }
+        return field[y][x]==fieldFigure;
+    }
+    public static boolean HorizonWin(int x, int y, char symbol){
+        if (x<0 || y<0 || x + Victory > Biglength ){
+            return false;
+        }
+        int c =0;
+        for (int i=0; i< Victory; i++){
+            if (field[i+x][y]==symbol){
+                c++;
+            }
+        }
+        return c == Victory;
+    }
+
+    public static boolean VerticalWin(int x, int y, char symbol){
+        if (x<0 || y<0 || y + Victory > Biglength ){
+            return false;
+        }
+        int c =0;
+        for (int i=0; i< Victory; i++){
+            if (field[x][y+i]==symbol){
+                c++;
+            }
+        }
+        return c == Victory;
+    }
+
+    public static boolean Diag1Win(int x, int y, char symbol){
+        if (x<0 || y<0 || x + Victory > Biglength || y+Victory >Biglength){
+            return false;
+        }
+        int c =0;
+        for (int i=0; i< Victory; i++){
+            if (field[i+x][i+y]==symbol){
+                c++;
+            }
+        }
+        return c == Victory;
+    }
+
+    public static boolean Diag2Win(int x, int y, char symbol) {
+        if (x < 0 || y + 1 - Victory < 0 || x + Victory > Biglength) {
+            return false;
+        }
+        int c = 0;
+        for (int i = 0; i < Victory; i++) {
+            if (field[i + x][y - i] == symbol) {
+                c++;
+            }
+        }
+        return c == Victory;
+    }
+}
